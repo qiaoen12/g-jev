@@ -8,7 +8,7 @@ assignees: []
 
 ## Original Intent
 
-<!-- Paste the user's original request or a fixed PRD reference. Keep it distinct from the implementation Contract. -->
+<!-- Paste the user's original request or a fixed PRD reference before drafting the implementation Contract. Keep both distinct. -->
 
 ## Contract
 
@@ -28,7 +28,7 @@ assignees: []
 
 Human Authority controls repository governance; Developer may create or edit the Contract. The independent Reviewer authorizes the current version. A GitHub Actor that wrote or materially edited this Contract must not add `approved` to the same Contract version.
 
-Chat instructions do not replace fresh `approved` for development. Work starts only after the independent Reviewer adds it. Developer and Reviewer must not merge; final Squash merge belongs to Human Authority after GitHub gates pass.
+Chat instructions do not replace fresh `approved` for development. Work starts only on an OPEN Issue after the independent Reviewer adds `approved` later than the current body edit; a later edit requires fresh independent approval. Developer and Reviewer must not merge; final Squash merge belongs to Human Authority after GitHub gates pass.
 
 ### Merge authorization
 

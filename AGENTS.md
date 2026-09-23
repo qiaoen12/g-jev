@@ -1,6 +1,6 @@
 # Agent protocol
 
-This repository uses the G-lite GitHub-native protocol.
+Jev uses the G-lite v3.4 GitHub-native collaboration protocol. Jev remains a separate product; this repository has no G-lite runtime or local task state.
 
 ## Contract
 
@@ -41,7 +41,7 @@ Human, Developer, and Reviewer credentials may coexist on one Mac. Before each k
 
 GitHub is the source of truth for Issue authorization, PR, Checks, Review, Ruleset, merge eligibility, and merge result. Do not create local task, review, merge, or approval state or a second GitHub database.
 
-The default branch requires PRs, at least one independent approval, stale review dismissal, a stable consumer-owned Required Check, squash-only merge, and no routine bypass. Enable Secret scanning / Push protection where supported. Consumer CI is owned by this repository and its Agent; G-lite does not generate or select it. Reconciler App assertions are invocation-only, require external verification of both roles, and do not authorize governance writes or manage credentials.
+The default branch requires PRs, at least one independent approval, stale review dismissal, a stable consumer-owned Required Check, squash-only merge, and no routine bypass. Enable Secret scanning / Push protection where supported. The consumer-owned `jev-docs` check verifies this documentation-only repository; it does not claim to test Jev code. Add code tests only under a separate approved task when code exists. G-lite does not generate or select consumer CI. Reconciler App assertions are invocation-only, require external verification of both roles, and do not authorize governance writes or manage credentials.
 
 ## Main delivery SOP
 
