@@ -1,31 +1,18 @@
-# PRD
+# 需求素材（可选）
 
-## Goal
-<!-- What outcome should exist when the task is complete? -->
+已有 Issue / PRD 直接读取，不要求套用本模板。信息足够时 Agent 自行整理；只有缺失信息会改变最终结果时才向负责人反问。
 
-## Why
-<!-- Why is this outcome needed? -->
+- 目标与预期结果：<希望完成后具有什么行为>
+- 范围与边界：<包含什么；不包含什么>
+- 已知约束与业务决定：<已有决定；仍会改变结果的缺口>
+- 验收要求：<如何确认结果成立，包括最终 L3 验收>
 
-## In Scope
-<!-- What work is included? -->
+## Agent 整理的内部 Task 数据
 
-## Out of Scope
-<!-- What must stay excluded? -->
+以下字段用于规划、依赖判断和完成核对。它们不是默认地图模板；用户可见看板不得直接展开成此明细表。
 
-## Expected Modules / Files
-<!-- Expected areas or files; use Unknown when they cannot yet be named. -->
+| Task | 预期结果 | 完成条件 | 预计影响文件 | 所需验证 | 必要依赖 |
+|---|---|---|---|---|---|
+| <简短标识与名称> | <可观察结果> | <可验证的交付条件> | <去重路径或未知> | <等级、计数单位、通过条件> | <Task 标识或无> |
 
-## Expected Size
-<!-- SMALL / MEDIUM / LARGE / REFACTOR / UNKNOWN, with a short basis. -->
-
-## Expected Complexity
-<!-- LOW / MEDIUM / HIGH / UNKNOWN, with a short basis. -->
-
-## Verification Plan
-<!-- Existing checks to reuse, expected new tests, test-first judgment, and CI. -->
-
-## Acceptance Criteria
-<!-- Observable conditions for completion. -->
-
-## Open Decisions
-<!-- Unresolved choices or Unknown. -->
+普通实现细节、任务拆分与验证组织由 Agent 自行决定。预计路径未知时不编造数字；不因原素材没有 checklist 拒绝建立任务。此整理只保留在当前上下文中，不自动改写原 Issue / PRD，不创建固定目录或任务状态文件；保存须使用用户指定路径。

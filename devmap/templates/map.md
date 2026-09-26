@@ -1,50 +1,152 @@
-# DevMap
+# 地图模板
 
-- **Stage:** Kickoff / Progress / Final
-- **Task / PRD:** <reference or conversation context>
-- **Evidence checked:** <diff/base or PR head, tests, CI check and run/head where available>
-- **Current stage / Plan Items:** <countable items and states; percentage only for PRD-defined items>
+按事件只选择以下一种结构并替换占位项。用户可见层使用简洁中文；默认不复述 Issue / PRD，不展开命令、日志、预期结果、完成条件或依赖。Task 名称是看板格子的默认内容。所有地图使用相同的 L0～L3 测试表。路径摘要优先使用目录树；真实文件数单独保留，折叠不得丢失或重复计数。
 
-## Map
+## 开工总地图
 
-| Field | Expected | Current | Status and evidence |
+# DevMap · <任务名称>
+
+| 总任务 | 已完成 | 预计文件 | 当前阻塞 |
+|---:|---:|---:|---:|
+| <数> | <数> | <数或未知> | <数> |
+
+| 待开始 | 开发中 | 测试中 | 已完成 |
 |---|---|---|---|
-| ATTENTION | — | GREEN / YELLOW / RED / UNKNOWN | <key evidence; mark semantic judgment> |
-| SIZE | SMALL / MEDIUM / LARGE / REFACTOR / UNKNOWN | <actual size or not started> | <basis> |
-| SCOPE | <PRD scope> | <observed scope> | MATCH / DRIFT / UNKNOWN; <changed paths or evidence> |
-| COMPLEXITY | LOW / MEDIUM / HIGH / UNKNOWN | <observed level or not started> | <basis> |
-| TEST | <verification levels and new-test range> | <baseline, tests actually run, and CI actually observed> | <reused tests, results, or UNKNOWN> |
+| <Task 名称> | <Task 名称或空> | <Task 名称或空> | <Task 名称或空> |
 
-## Test Baseline
+## 预计改动
 
-**Existing**
+预计修改文件：<真实文件数或未知>
+新增依赖：<数或未知>
+范围变化：<无 / 有：一句话 / 未知>
 
-- Test files / cases: <project total and counting unit>
-- Task-related tests: <count and names, or none found>
-- Current CI covers: <checks and observed scope/result, or UNKNOWN>
+<预计文件的目录树或折叠目录摘要>
 
-**Expected**
+## 测试
 
-- Reusable tests: <names and levels, or none identified>
-- Added tests: <range and scope, or UNKNOWN>
-- Test-first: <yes/no and short reason, or UNKNOWN>
-- Verification levels: <project names, optionally mapped L0–L4>
+| 等级 | 用途 | 总数 | 通过 | 失败 | 待做 |
+|---|---|---:|---:|---:|---:|
+| L0 | 规范检查 | <数> | <数> | <数> | <数> |
+| L1 | 单项验证 | <数> | <数> | <数> | <数> |
+| L2 | 联合验证 | <数> | <数> | <数> | <数> |
+| L3 | 最终验收 | <数> | <数> | <数> | <数> |
 
-## Expected vs Current
+当前问题：<无，或一句话>
+下一步：<一句话>
 
-- Modules: <expected> → <current>
-- Files: <expected count/range> → <actual count and A/M/D paths>
-- Verification: <planned> → <actually run / observed>
-- Complexity / scope changes: <evidence or none observed>
+看板四列只写 Task 名称；仅阻塞 Task 可在名称后附简短“阻塞”标记。预期结果、完成条件和依赖保留在内部 Task 数据。不开设项目级阶段线，不显示主观百分比，不添加完整 Task 明细表。
 
-For at most 40 changed files, list every path with A/M/D. Above 40, fold ordinary paths by directory with file count and additions/deletions, but list each clearly out-of-scope or unusual file separately.
+## Task 完成地图
 
-## Evidence and judgment
+# DevMap · <Task 名称> · 已完成
 
-- **Verified facts:** <source path/section, diff status, test result, or CI link/head>
-- **Semantic judgments:** <interpretation of scope, size, complexity, or attention and the evidence used>
-- **Unknown / not checked:** <missing evidence; do not present as a result>
+文件：计划 <数或未知> / 实际 <数或未知>
+新增：<数> · 删除：<数> · 范围变化：<无 / 有：一句话 / 未知>
 
-## Natural checkpoints (optional; about five lines maximum)
+修改：
 
-- <Optional advisory moments to call `/devmap` again; omit if not useful.>
+<仅此 Task 的实际路径树或折叠摘要；如有新增、删除则分别标注>
+
+## 测试
+
+| 等级 | 用途 | 总数 | 通过 | 失败 | 待做 |
+|---|---|---:|---:|---:|---:|
+| L0 | 规范检查 | <数> | <数> | <数> | <数> |
+| L1 | 单项验证 | <数> | <数> | <数> | <数> |
+| L2 | 联合验证 | <数> | <数> | <数> | <数> |
+| L3 | 最终验收 | <数> | <数> | <数> | <数> |
+
+结果：<一句话交付结论>
+
+不得显示其他 Task。
+
+## Task 阻塞地图
+
+# DevMap · <Task 名称> · <开发中 / 测试中> · 阻塞
+
+原因：<一句话>
+已完成：<一句话>
+影响：<一句话>
+需要负责人决定：<具体决定，或等待的外部条件>
+其他 Task：<可以继续的 Task，或无>
+
+文件：计划 <数或未知> / 实际 <数或未知>
+新增：<数> · 删除：<数> · 范围变化：<无 / 有：一句话 / 未知>
+
+修改：
+
+<此 Task 的实际路径树或折叠摘要；如有新增、删除则分别标注>
+
+## 测试
+
+<统一 L0～L3 测试表>
+
+只解释阻塞原因、完成到哪里、影响、需要负责人处理的事项和其他 Task 能否继续。
+
+## Task 重新打开地图
+
+# DevMap · <Task 名称> · 重新打开 → <开发中 / 测试中>
+
+原因：<哪项联合验证或最终验收推翻原完成结论>
+影响：<一句话>
+
+文件：计划 <数或未知> / 实际 <数或未知>
+新增：<数> · 删除：<数> · 范围变化：<无 / 有：一句话 / 未知>
+
+修改：
+
+<此 Task 的实际路径树或折叠摘要；如有新增、删除则分别标注>
+
+## 测试
+
+<统一 L0～L3 测试表>
+
+下一步：<一句话修复或重新验证要求>
+
+不得重述此前开发过程。
+
+## 最终总地图
+
+# DevMap · <任务名称> · 全部完成
+
+| 总任务 | 已完成 | 实际文件 | 当前阻塞 |
+|---:|---:|---:|---:|
+| <数> | <数> | <数或未知> | 0 |
+
+计划文件：<数或未知> → 实际文件：<数或未知>
+新增：<数> · 删除：<数>
+范围变化：<无 / 有：一句话 / 未知>
+发生过的阻塞：<数或未知>
+
+<全任务去重后的实际路径树或折叠目录摘要>
+
+## 测试
+
+| 等级 | 用途 | 总数 | 通过 | 失败 | 待做 |
+|---|---|---:|---:|---:|---:|
+| L0 | 规范检查 | <数> | <数> | <数> | <数> |
+| L1 | 单项验证 | <数> | <数> | <数> | <数> |
+| L2 | 联合验证 | <数> | <数> | <数> | <数> |
+| L3 | 最终验收 | <数> | <数> | <数> | <数> |
+
+最终结果：<一句话交付结论>
+
+最终地图不展示已完成 Task 明细、完整开发过程或四列空看板。
+
+## 文件树与计数规则
+
+- 计划或实际文件不超过 30 个时，尽量展开真实路径并按目录组织成树。
+- 超过 30 个文件时，按不重叠目录折叠并显示每个目录包含的真实文件数；仍超过约 30 行时继续向父目录折叠。
+- 重要文件可以单独显示，但须从目录计数中扣除，并写明“其余”文件数。
+- 表头中的计划 / 实际真实文件数不等于目录树的展示项数。每个文件只能由一个树叶或目录项代表；目录项不得重叠，展示数须守恒。
+
+## 统一测试表（每张地图仅一张）
+
+| 等级 | 用途 | 总数 | 通过 | 失败 | 待做 |
+|---|---|---:|---:|---:|---:|
+| L0 | 规范检查 | <数或未知> | <数或未知> | <数或未知> | <数或未知> |
+| L1 | 单项验证 | <数或未知> | <数或未知> | <数或未知> | <数或未知> |
+| L2 | 联合验证 | <数或未知> | <数或未知> | <数或未知> | <数或未知> |
+| L3 | 最终验收 | <数或未知> | <数或未知> | <数或未知> | <数或未知> |
+
+计数单位写在测试表附近。同一行总数 = 通过 + 失败 + 待做；失败后修复通过时按最新有效结果计数。未知不能填 0。不适用的等级写 0 并注明不适用。若需说明仓库检查状态，使用“自动检查”及中文状态，不显示底层版本标识、开发缩写或命令。
