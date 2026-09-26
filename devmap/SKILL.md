@@ -1,84 +1,92 @@
 ---
 name: devmap
-description: Create or update a concise, evidence-backed development map from the current task PRD, repository changes, tests, and CI. The only user-facing entry is /devmap.
+description: 将需求整理为 Task 开发看板；开工和最终验收后各一张总地图，过程中仅在 Task 完成、确认阻塞或重新打开时报告。唯一用户入口是 /devmap。
 ---
 
 # DevMap v1.1
 
-Use this Skill only when the user explicitly invokes `/devmap`. `/devmap` is the single entry point. Do not require or teach subcommands such as `preflight`, `checkpoint`, or `final`.
+仅在用户显式调用 `/devmap` 时启用。没有子命令。启用后，在当前任务的 Harness 对话上下文中持续观察已有开发、验证和 CI 事实，按下述事件选择报告；再次调用不等于产生新事件。不新增定时器、后台监听、hooks、外部模型接口或运行代码。
 
-DevMap observes and summarizes a task. It does not implement changes, orchestrate Agents, enforce a workflow, or change development authorization. Use the current Harness model for semantic judgments. This version has no Jev API, TypeSafe SDK, MCP, provider abstraction, model router, or runtime integration.
+DevMap 是负责人和非技术人员的简洁中文开发看板。它整理任务并观察结果，不执行开发、不编排 Agent、不改变开发授权，也不替代 GitHub Issues / Projects。原始 Issue / PRD 保持原样。
 
-## 1. Identify the stage
+## 1. 将需求整理为 Task
 
-Read the current conversation and available task artifacts, then choose one stage:
+先读当前对话、已有 Issue / PRD 及可用的项目文件。Issue / PRD 是素材，不要求 checklist 或模板格式。信息足够时由 Agent 自行拆分 Task、安排普通实现细节与测试组织；不得因缺少结构而拒绝建立计划或进度。`templates/prd.md` 只是可选素材提示，不要求用户填表。
 
-- **Kickoff**: implementation has not started and the user needs an opening map.
-- **Progress**: implementation is underway and the user needs Expected vs Current.
-- **Final**: implementation is complete or the user asks for delivery status.
+只有无法从现有材料推导、且会改变最终开发结果的缺失信息才向 Human 反问：不同产品行为、业务决策、是否扩大范围等。一次只问影响结果的缺口。对可自行决定的细节不反问；明确的任务仍可整理，依赖未决结果的任务标记相应阻塞。
 
-Infer the stage from context. If it remains unclear, ask one short question about whether the user wants a kickoff, progress, or final map. Do not ask the user to choose a subcommand.
+每个 Task 在当前上下文中至少保留以下信息，不要求落盘：
 
-## 2. Align with the PRD
+| 信息 | 内容 |
+|---|---|
+| 标识与名称 | 稳定的简短标识、易懂名称；重开沿用同一标识 |
+| 预期结果 | 可观察的完成条件与素材引用 |
+| 预计影响文件 | 去重路径集合；尚不能确定时写“未知”，不虚构数量 |
+| 所需测试 | 等级、计数单位、要求验证的项目及通过条件 |
+| 依赖 | 必要的前置 Task；无依赖写“无” |
+| 当前情况 | 四状态之一、阻塞原因（如有）、实际文件集合、验证结果 |
 
-Look for a PRD or fixed product brief already supplied in the conversation or project. If one exists, read it in place and preserve its format. Do not rewrite it merely to match the template.
+保留原计划以便与实际比较；后续获准的范围变化单独说明，不把实际结果回填为原计划。共享文件在各 Task 内各算一次，总地图对所有 Task 路径取并集，避免相加重复。预计与实际统一按路径计数，包括可见未跟踪文件；重命名在路径计数中按旧路径删除、新路径新增，说明此口径。
 
-Extract these fields, preserving the source's wording where useful:
+上下文内可保留当前状态、已报告事件和阻塞记录以防重复，不建立 `.devmap/`、本地任务数据库或完整过程日志。信息丢失时从当前可信材料重建，无法核实的数量、历史报告和阻塞次数写“未知”；不得猜测并补发历史地图。用户要求保存时，仅写用户指定路径；没有路径时先询问保存位置。
 
-- Goal
-- Why
-- In Scope
-- Out of Scope
-- Expected Modules / Files
-- Expected Size
-- Expected Complexity
-- Verification Plan
-- Acceptance Criteria
-- Open Decisions
+## 2. Task 状态与完成条件
 
-If an existing PRD is missing information, ask only for the missing fields that affect the requested map. Do not repeat fields already answered or start discussing an implementation design. If no PRD exists, use one brief clarification only to establish the product brief; infer only what is explicit in the request, ask about remaining gaps, and leave unresolved details as Open Decisions. Do not enter an implementation-plan discussion.
+每个 Task 独立拥有 **待开始、开发中、测试中、已完成** 四个状态。阻塞是附加状态，例如“开发中 · 阻塞”，不计为第五阶段。四状态数量之和必须等于 Task 总数；当前阻塞数是其中的子集。
 
-If the user wants a PRD or map saved, use the path they gave. If they requested saving or updating but gave no path, ask for the path before writing. Otherwise keep the PRD and map in the current conversation. Never invent a fixed directory, create `.devmap/`, or create repository-local state, configuration, history, or session files.
+- 尚未实施是待开始；实施期间是开发中；实现已具备、正在验证是测试中。
+- 实现完成且该 Task **所有要求验证均通过**才是已完成。未运行、不可访问、失败或结果未知都不等于通过。
+- 普通测试失败可在测试中继续修复，或回到开发中，不因此自动阻塞。
+- 只有在已有信息与授权内无法合理继续才确认阻塞：缺少必须的批准、权限、Human 决策或外部依赖，或继续会明显超出范围。说明阻塞影响到的依赖；无依赖的其他 Task 仍可继续。
+- 已完成 Task 被后续联合测试或 L3 验收证明失效时，撤销已完成，回到开发中（需要修复）或测试中（需要重新验证），输出重开事件。之后验证再次全部通过才可再次完成。
 
-## 3. Kickoff: establish Test Baseline first
+当前阻塞数按受阻 Task 计数；“发生过的阻塞数量”按独立阻塞事件计数。同一个未解除原因重复观察不累计，解除后再次发生算新事件；最终报告历史累计数，无已知历史则写未知。
 
-Before emitting a kickoff map, inspect the available project facts and the PRD's Verification Plan and Acceptance Criteria. Read, when available:
+## 3. 唯一报告触发协议
 
-- Existing test directories and test files.
-- Tests related to this task.
-- Test commands and framework configuration.
-- `.github/workflows/` and current GitHub CI/check results for the relevant base or PR HEAD.
+依据 `templates/map.md` 选择一种地图。不要用项目级“准备 → 开发 → 验证 → 完成”作为主地图，不输出日常进度地图或主观完成百分比。
 
-Report unavailable evidence as `UNKNOWN` or `not accessible`; do not infer a passing result. Count existing tests using a stated, repeatable unit (at minimum, test files; also count test cases only when they can be enumerated reliably). Give both the project-wide total and the task-relevant count. Preserve project test names. Map them to the optional observation levels only when useful:
+| 观察到的事件 | 输出 |
+|---|---|
+| 需求已整理为可执行 Task，正式开发尚未开始 | 开工总地图一次 |
+| Task 实现与要求验证全部完成 | 仅该 Task 的完成地图一次 |
+| Task 确认阻塞 | 仅该 Task 的阻塞地图一次 |
+| 已完成 Task 被联合测试或 L3 验收证明失效 | 仅该 Task 的重新打开地图一次 |
+| 所有 Task 已完成、最终要求的 L3 验收全部通过、无未解决阻塞 | 最终总地图一次 |
+| Task 开始、进入开发、写代码、进入测试、普通失败、修复、重新测试 | 不生成 DevMap 地图 |
 
-- L0 Static
-- L1 Unit
-- L2 Integration
-- L3 Acceptance / Contract / Semantic
-- L4 E2E / Pilot
+“一次”指同一事件只报告一次。阻塞未解除不反复报告；Task 重开后再次完成是新的完成事件。最终总地图按同一交付周期只发一次。最终验收发现失效则重新打开相关 Task，撤销原最终结论；重新满足门槛后可报告修正后的最终结果，明确这是修正。最后一个 Task 完成和最终门槛同时满足时，先输出该 Task 地图，再输出最终总地图；不要把其他 Task 过程复述出来。
 
-A test may also be labeled Permanent, Stage, or Pilot. These are observations, not a required project taxonomy.
+若首次启用时开发已经开始，不补发开工地图，观察此后的合格事件；若已有足够证据证明最终门槛满足且尚未报告，则可输出最终总地图。没有合格新事件时不输出地图；Harness 必须回复时仅简短说明“暂无新的地图事件”。DevMap 的静默规则只控制地图，不阻止 Harness 必须的授权询问和协作沟通。
 
-The kickoff map separates **Existing** from **Expected**. Existing reports test totals, task-related tests, reusable tests, and what current CI covers. Expected reports a reasonable range for added tests and whether test-first is recommended, with a short reason. Estimate ranges only when evidence supports them; otherwise use `UNKNOWN` and say why. Do not tell the project to change its test system.
+## 4. 文件数量与路径摘要
 
-## 4. Build the map from evidence
+每张总地图与 Task 地图均保留原计划 / 实际去重文件数、新增 / 删除数、范围变化、路径摘要和测试表。开工实际数可写 0；不可知时写未知，不以 0 冒充。范围变化用“无 / 有：一句话原因 / 未知”，判断基于预期结果与实际变化，不仅比较数量。
 
-Use `templates/map.md` as the output structure. Keep the map compact and retain these core fields:
+路径区域最多约 30 行，执行以下折叠规则；若计划与实际不同，同一区域标注各自数量，整个区域共同遵守预算：
 
-- **ATTENTION**: GREEN, YELLOW, RED, or UNKNOWN.
-- **SIZE**: SMALL, MEDIUM, LARGE, REFACTOR, or UNKNOWN.
-- **SCOPE**: compare the requested scope with actual changes; mark drift or UNKNOWN when evidence is incomplete.
-- **COMPLEXITY**: LOW, MEDIUM, HIGH, or UNKNOWN.
-- **TEST**: baseline, expected verification, actual runs/results, and CI status.
+1. 总路径并集不超过 30 个时，逐个显示具体路径及预计 / 实际 A/M/D 标记；仅计划项写“预计”，不伪造实际状态。
+2. 超过 30 个时，将同一上游目录下的普通文件合并为一行，附真实文件数（必要时分别列计划 / 实际及 A/D 数）。
+3. 合并后仍超过 30 行，继续向父目录合并，直到满足预算；极端情况可折叠到仓库根目录。
+4. AGENTS.md、主要配置、主要 CI 工作流等具有架构意义的文件优先单列。在预算无法兼顾全部时也可折叠，点明所在目录含关键文件。
+5. 单列文件须从所属目录计数中扣除，注明“其余”；各行代表不重叠路径集合。折叠仅改变显示，不丢弃路径或改变文件总数；所有行按同一口径加总必须还原计划 / 实际数量。
 
-At kickoff, provide Expected Size, Complexity, modules, an estimated file-count range, verification levels, and an added-test range. At progress and final stages, show **Expected vs Current** directly. Include the key evidence behind each state: PRD section, file path and diff status, named test and result, workflow/check name, or CI link/head when available. Separate facts that can be verified from semantic judgments made from the evidence. Use `UNKNOWN` instead of forcing a conclusion when evidence is insufficient.
+不在主地图展开逐行 diff、命令和日志。保留可追溯的 PR / 来源引用，需要核实时再提供底层证据。
 
-For file changes, include every changed path and its A/M/D status when the total is 40 or fewer. Above 40, group ordinary files by directory and report file count plus additions/deletions. Always list clearly out-of-scope or unusual files individually, even in folded groups. Include untracked files in the count when visible.
+## 5. 统一测试摘要
 
-For progress, prefer the current stage, modules, and countable Plan Items. Calculate completed/total only when the PRD already defines explicit work items; derive any percentage only from that count. Never produce a subjective completion percentage.
+先检查可用的项目测试、任务验证计划和相关 CI。复用已有项目验证方式，不强制新增测试体系。开工前识别可复用检查和最终 L3 验收要求，不要求无关全量基线运行。
 
-In a final map, report only tests actually run and CI results actually observed. Distinguish “not run,” “not configured,” “not accessible,” and “passed”; do not claim a check passed just because it is expected to run.
+所有地图只使用一张相同结构的测试摘要表：**等级、用途、总数、通过、失败、待做**。默认四行：L0 规范检查、L1 单项验证、L2 联合验证、L3 最终验收。沿用项目真实测试的名称和含义，无法可靠映射时标明未知，不把 CI job 数冒充测试用例数。
 
-## 5. Natural checkpoints
+- 明确计数单位，例如检查项或测试用例；同一行不可混用，同一验证不要因本地和 CI 重跑而重复计数。
+- 数量已知时，总数 = 通过 + 失败 + 待做，使用最新有效结果；失败后修复通过不再同时算失败。待做含未运行、跳过及结果仍待确认的计划验证，不代表通过。
+- 无法枚举时使用“未知”，明确未配置 / 未运行 / 不可访问等原因。已知不适用可写 0 并注明不适用；缺证据不能写 0 失败来暗示全部通过。
+- 开工表展示计划及已实际观察的基线结果；完成地图展示该 Task 的要求验证，最终总地图汇总去重验证。最终 L3 未运行、失败或不可访问时不得输出成功的最终地图。
+- CI 只摘要已观察到的结果及对应 HEAD / 链接；旧 HEAD 结果不可证明新 HEAD 通过。详细命令、日志、底层测试证据按需提供，不默认展开。
 
-Optionally suggest at most about five short lines for a user to call `/devmap` after natural events such as a module finishing, scope or dependencies changing, local verification ending, or before delivery. Suggestions are advisory. Do not add timers, hooks, observers, background polling, automatic blocks, or compliance tracking.
+## 6. 呈现与验收
+
+地图使用简洁、客观的中文，优先数量与状态，主要结论尽量在单个视图内看完。只保留任务名称、结果和必要来源，不重新展示 Issue / PRD 的段落。阻塞与重开地图的文件 / 测试摘要仅服务于说明当前完成程度和影响。不要加入 ATTENTION、SIZE、COMPLEXITY 等旧主地图字段或提醒用户定期调用的检查点。
+
+[Mock 验收样例](fixtures/report-protocol.md) 提供可重放输入、预期输出和事件判据，用于验证文本 Skill 的语义协议；它不是运行程序或项目状态。

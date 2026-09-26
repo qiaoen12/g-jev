@@ -1,31 +1,16 @@
-# PRD
+# 需求素材（可选）
 
-## Goal
-<!-- What outcome should exist when the task is complete? -->
+已有 Issue / PRD 直接读取，不要求套用本模板。信息足够时 Agent 自行整理；只有缺失信息会改变最终结果时才反问 Human。
 
-## Why
-<!-- Why is this outcome needed? -->
+- 目标与预期结果：<希望完成后具有什么行为>
+- 范围与边界：<包含什么；不包含什么>
+- 已知约束与业务决定：<已有决定；仍会改变结果的缺口>
+- 验收要求：<如何确认结果成立，包括最终 L3 验收>
 
-## In Scope
-<!-- What work is included? -->
+## Agent 整理的 Task
 
-## Out of Scope
-<!-- What must stay excluded? -->
+| Task | 预期结果 | 预计影响文件 | 所需测试 | 必要依赖 |
+|---|---|---|---|---|
+| <简短标识与名称> | <可观察完成条件> | <去重路径或未知> | <等级、计数单位、通过条件> | <Task 标识或无> |
 
-## Expected Modules / Files
-<!-- Expected areas or files; use Unknown when they cannot yet be named. -->
-
-## Expected Size
-<!-- SMALL / MEDIUM / LARGE / REFACTOR / UNKNOWN, with a short basis. -->
-
-## Expected Complexity
-<!-- LOW / MEDIUM / HIGH / UNKNOWN, with a short basis. -->
-
-## Verification Plan
-<!-- Existing checks to reuse, expected new tests, test-first judgment, and CI. -->
-
-## Acceptance Criteria
-<!-- Observable conditions for completion. -->
-
-## Open Decisions
-<!-- Unresolved choices or Unknown. -->
+普通实现细节、任务拆分与测试组织由 Agent 自行决定。预计文件未知时不编造数字；不因原素材没有 checklist 拒绝建立任务。此整理只保留在当前上下文中，不自动改写原 Issue / PRD，不创建固定目录或任务状态文件；保存须使用用户指定路径。
