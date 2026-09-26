@@ -11,11 +11,16 @@ permissions:
 jobs:
   jev-docs:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
       - name: Check Jev docs and Issue protocol
         run: |
           set -eu
+          workflow=.github/workflows/jev-docs.yml
           test -s README.md
           test -s AGENTS.md
           test -s .github/ISSUE_TEMPLATE/task.md
@@ -25,3 +30,62 @@ jobs:
           grep -Fq 'jev-docs' AGENTS.md
           grep -Fq '### Authorization' .github/ISSUE_TEMPLATE/task.md
           awk '/^## Original Intent$/{intent=NR} /^## Contract$/{contract=NR} END {exit !(intent && contract && intent < contract)}' .github/ISSUE_TEMPLATE/task.md
+          # Line-based guards cover this workflow's current layout, not arbitrary YAML.
+          grep -Fqx '  pull_request:' "$workflow"
+          grep -Fqx '  push:' "$workflow"
+          grep -Fqx '    branches: [main]' "$workflow"
+          grep -Fqx '  jev-docs:' "$workflow"
+          grep -Fqx '    timeout-minutes: 10' "$workflow"
+          grep -Fqx '          fetch-depth: 1' "$workflow"
+          grep -Fqx '          persist-credentials: false' "$workflow"
+          # This guard supports this file's unquoted workflow keys and uses entries, not arbitrary YAML syntax.
+          if grep -Eq '^[[:space:]]*pull_request_target:' "$workflow"; then
+            printf '%s\n' 'pull_request_target is not allowed.' >&2
+            exit 1
+          fi
+          if ! awk '
+            /^[[:space:]]*(-[[:space:]]*)?uses:[[:space:]]*/ {
+              value = $0
+              sub(/^[[:space:]]*(-[[:space:]]*)?uses:[[:space:]]*/, "", value)
+              sub(/[[:space:]]+#.*/, "", value)
+              if (value ~ /^\.\//) next
+              at = index(value, "@")
+              if (at == 0) {
+                invalid = 1
+              } else {
+                ref = substr(value, at + 1)
+                if (length(ref) != 40 || ref ~ /[^[:xdigit:]]/) invalid = 1
+                else actions++
+              }
+            }
+            END { exit !(actions > 0 && !invalid) }
+          ' "$workflow"; then
+            printf '%s\n' 'External Actions must be pinned to a full commit SHA.' >&2
+            exit 1
+          fi
+          if ! grep -Eq '^      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1([[:space:]]+#.*)?$' "$workflow"; then
+            printf '%s\n' 'actions/checkout must use the approved v7.0.1 commit.' >&2
+            exit 1
+          fi
+          if ! awk '
+            /^[[:space:]]*permissions[[:space:]]*:/ {
+              permission_keys++
+              if ($0 != "permissions:") invalid = 1
+              in_permissions = 1
+              next
+            }
+            in_permissions && /^[^[:space:]#]/ {
+              in_permissions = 0
+            }
+            in_permissions && /^[[:space:]]*contents[[:space:]]*:[[:space:]]*read[[:space:]]*$/ {
+              contents++
+              next
+            }
+            in_permissions && /^[[:space:]]*[[:alnum:]_-]+[[:space:]]*:/ {
+              invalid = 1
+            }
+            END { exit !(permission_keys == 1 && contents == 1 && !invalid) }
+          ' "$workflow"; then
+            printf '%s\n' 'Workflow permissions must be limited to contents: read.' >&2
+            exit 1
+          fi
