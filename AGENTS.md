@@ -1,6 +1,13 @@
 # Agent protocol
 
-Jev uses the G-lite v3.4 GitHub-native collaboration protocol. Jev remains a separate product; this repository has no G-lite runtime or local task state.
+Jev remains a separate product; this repository has no G-lite runtime or local task state. Its earlier protocol adoption was G-lite v3.4. The managed block below is the current G-lite protocol.
+
+The consumer-owned required check is `jev-docs`. It verifies this documentation-only repository and does not claim to test Jev code. Add code tests only under a separate approved task when code exists.
+
+<!-- g-lite:managed protocol start -->
+# Agent protocol
+
+This repository uses the G-lite GitHub-native protocol.
 
 ## Contract
 
@@ -31,7 +38,9 @@ In each checkout that uses the local credential entry, first add `.g-lite-local/
 
 Developer / Reviewer use short-lived Installation Access Tokens. Never put private keys, JWTs, tokens, or PATs in repo, Issue, PR, evidence logs, or canonical state; do not persist tokens in state files. Local credentials stay in external secure mechanisms, outside canonical runtime.
 
-The current shell or `gh` showing a human Actor does not prove the target Bot credentials are absent. For the required Developer / Reviewer role, check `.g-lite-local/credentials` first; if missing or unusable, check the machine-local `~/.config/g-lite/` configuration entry before reporting that credentials are unavailable. Inspect only minimal metadata needed to select the target Actor, such as existence, type, and accessibility. Do not enumerate or display credential contents or record keys, JWTs, tokens, PATs, or resolved machine-specific credential paths in repo, Issue, PR, or logs.
+For Developer / Reviewer operations, first invoke the configured role entry available in the current workspace / machine. The role entry must live-verify the expected API Actor and target repository access; credential paths, environment variables, or a human `gh` login do not establish identity. An Actor or access mismatch is `BLOCK`: stop the role action, do not guess private-key layouts or attempt temporary authentication, and do not fall back to Human identity.
+
+Only when no callable role entry is available, inspect `.g-lite-local/credentials` and the machine-local `~/.config/g-lite/` entry for minimal existence, type, and accessibility metadata. Do not enumerate or display credential contents, or record private keys, JWTs, tokens, PATs, or resolved machine-specific credential absolute paths in the repository, Issue, PR, evidence logs, or canonical state.
 
 Verify API Actor, commit author, and Git transport separately. Developer clone/fetch/push uses App HTTPS credentials. Before each operation verify the effective HTTPS remote and absence of applicable insteadOf rewrite: user/global Git config can silently turn HTTPS into human SSH authentication. Prefer task-process config/credential isolation, inspect repo-local config, and preserve existing user global Git / SSH settings.
 
@@ -41,7 +50,7 @@ Human, Developer, and Reviewer credentials may coexist on one Mac. Before each k
 
 GitHub is the source of truth for Issue authorization, PR, Checks, Review, Ruleset, merge eligibility, and merge result. Do not create local task, review, merge, or approval state or a second GitHub database.
 
-The default branch requires PRs, at least one independent approval, stale review dismissal, a stable consumer-owned Required Check, squash-only merge, and no routine bypass. Enable Secret scanning / Push protection where supported. The consumer-owned `jev-docs` check verifies this documentation-only repository; it does not claim to test Jev code. Add code tests only under a separate approved task when code exists. G-lite does not generate or select consumer CI. Reconciler App assertions are invocation-only, require external verification of both roles, and do not authorize governance writes or manage credentials.
+The default branch requires PRs, at least one independent approval, stale review dismissal, a stable consumer-owned Required Check, squash-only merge, and no routine bypass. Enable Secret scanning / Push protection where supported. Consumer CI is owned by this repository and its Agent; G-lite does not generate or select it. Reconciler App assertions are invocation-only, require external verification of both roles, and do not authorize governance writes or manage credentials.
 
 ## Main delivery SOP
 
@@ -65,3 +74,4 @@ The default branch requires PRs, at least one independent approval, stale review
    Without a strict latest-base Ruleset, main can advance between the last read and merge.
 6. Ask Human Authority for scope changes, unverifiable identity/authorization/gates, governance or high-impact actions,
    or about three failures on one path without new evidence. Continue routine CI and Review rework within scope.
+<!-- g-lite:managed protocol end -->
